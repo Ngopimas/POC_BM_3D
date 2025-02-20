@@ -51,7 +51,8 @@ const findPopularHeader = (popularArray: string[], headers: string[]) => {
  * />
  */
 const MappingWidget = ({ data }: { data: ParseResult }) => {
-  const { setSelectedProperty, setColorScale } = useMappingContext();
+  const { selectedProperty, setSelectedProperty, setColorScale } =
+    useMappingContext();
   const headers = useMemo(() => {
     return data?.meta.fields || [];
   }, [data]);
@@ -125,15 +126,23 @@ const MappingWidget = ({ data }: { data: ParseResult }) => {
       label: "toggle edges",
       hint: "Show blocks edges. Can lead to performance issues",
     },
+    hiddeZeroValues: {
+      value: true,
+      label: "hide 0",
+      hint: "Hide blocks with 0 values",
+    },
   });
 
-  const property = _.get(mapping, "property");
-
   const boxesData = useMemo(() => {
-    return property
-      ? data?.data?.filter((item) => !!item[property])
+    return selectedProperty
+      ? data?.data?.filter((item) => {
+          if (mapping.hiddeZeroValues) {
+            return !!item[selectedProperty];
+          }
+          return !_.isNil(item[selectedProperty]);
+        })
       : data?.data;
-  }, [property, data]);
+  }, [selectedProperty, mapping.hiddeZeroValues, data]);
 
   type MappingKeys = keyof typeof mapping;
 

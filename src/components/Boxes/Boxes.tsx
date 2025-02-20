@@ -5,6 +5,7 @@ import _ from "lodash";
 import { ArrowTable } from "~/interfaces/ArrowTable";
 import CrossSectionWidget from "~/components/CrossSectionWidget";
 import { useColorManagement } from "~/hooks/useColorManagement";
+import { useMappingContext } from "~/context/MappingContext";
 
 const obj = new THREE.Object3D();
 
@@ -74,6 +75,7 @@ interface Props {
  */
 function Boxes({ data = [], mapping, arrow }: Props) {
   const [clippingPlane, setClippingPlane] = useState<THREE.Plane | null>(null);
+  const { selectedProperty, colorScale } = useMappingContext();
 
   const ref = useRef<THREE.InstancedMesh>();
   const edgesRef = useRef<THREE.InstancedMesh>();
@@ -82,8 +84,8 @@ function Boxes({ data = [], mapping, arrow }: Props) {
   const { colorArray } = useColorManagement({
     data,
     arrow,
-    property,
-    colorscale,
+    property: selectedProperty || property,
+    colorscale: colorScale || colorscale,
   });
 
   useLayoutEffect(() => {
