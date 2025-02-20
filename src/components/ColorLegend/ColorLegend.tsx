@@ -1,6 +1,5 @@
 import chroma from "chroma-js";
 import _ from "lodash";
-import { ColorsScales } from "~/interfaces/ColorsScales";
 import { getMinMaxFromArrow } from "~/utils/arrow";
 import { ArrowTable } from "~/interfaces/ArrowTable";
 import { useMappingContext } from "~/context/MappingContext";
@@ -9,12 +8,33 @@ interface ColorLegendProps {
   arrow: ArrowTable;
 }
 
+/**
+ * Calculates a step value based on a range and multiplier
+ * @param {number|null} range - The total range of values
+ * @param {number} n - The multiplier to calculate the step (between 0 and 1)
+ * @returns {string|undefined} The calculated step value formatted to 2 decimal places or undefined if range is null
+ */
+const getStep = (range: number | null, n: number) => {
+  if (!range) {
+    return;
+  }
+  const step = range * n;
+  return step.toFixed(2);
+};
+
+/**
+ * A component that displays a color gradient legend with evenly spaced markers
+ * for the selected property in the data.
+ * @param {ColorLegendProps} props - The component props
+ * @param {ArrowTable} props.arrow - The Arrow table containing the data
+ * @returns {React.ReactElement|null} The color legend component or null if no property is selected
+ */
 const ColorLegend: React.FC<ColorLegendProps> = ({ arrow }) => {
   const { selectedProperty, colorScale } = useMappingContext();
 
   if (!selectedProperty || !colorScale) return null;
 
-  const { min, max } = getMinMaxFromArrow(arrow, selectedProperty);
+  const { min, max, range } = getMinMaxFromArrow(arrow, selectedProperty);
   if (_.isNil(min) || _.isNil(max)) return null;
 
   const gradientStops = chroma
@@ -54,10 +74,13 @@ const ColorLegend: React.FC<ColorLegendProps> = ({ arrow }) => {
         style={{
           display: "flex",
           justifyContent: "space-between",
-          fontSize: "12px",
+          fontSize: "10px",
         }}
       >
         <span>{min.toFixed(2)}</span>
+        <span>{getStep(range, 0.25)}</span>
+        <span>{getStep(range, 0.5)}</span>
+        <span>{getStep(range, 0.75)}</span>
         <span>{max.toFixed(2)}</span>
       </div>
     </div>
