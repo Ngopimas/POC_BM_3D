@@ -106,35 +106,68 @@ const Screenshot = () => {
   useFrame((state) => (cameraRef.current = state.camera));
   useControls("Global Settings", {
     SCREENSHOT: button(async () => {
-      // open in new window
-      const w = window.open("", "") as Window;
-      w.document.title = "Screenshot";
+      // Create a canvas to compose the final image
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-      // Create container for both scene and legend
-      const container = document.createElement("div");
-      container.style.position = "relative";
-
-      // Capture scene
-      const sceneImg = new Image();
+      // Render scene to get its dimensions
       gl.render(scene, cameraRef.current || camera);
+      const sceneImg = new Image();
       sceneImg.src = gl.domElement.toDataURL();
-      container.appendChild(sceneImg);
 
-      // Capture and position legend
+      // Set canvas size to match scene
+      canvas.width = sceneImg.width || gl.domElement.width;
+      canvas.height = sceneImg.height || gl.domElement.height;
+
+      // Fill white background
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw scene first
+      await new Promise((resolve) => {
+        sceneImg.onload = () => {
+          ctx.drawImage(sceneImg, 0, 0);
+          resolve(true);
+        };
+      });
+
+      // Add legend if it exists
       const legendElement = document.querySelector(
         "#color-legend"
       ) as HTMLElement;
       if (legendElement) {
         const legendImg = new Image();
         legendImg.src = await htmlToImage(legendElement);
-        legendImg.style.position = "absolute";
-        legendImg.style.left = "20px";
-        legendImg.style.top = "20px";
-        legendImg.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
-        container.appendChild(legendImg);
+        await new Promise((resolve) => {
+          legendImg.onload = () => {
+            const scale = 1.5; // Scale the legend by 1.5x
+            ctx.drawImage(
+              legendImg,
+              20, // x position
+              20, // y position
+              legendImg.width * scale,
+              legendImg.height * scale
+            );
+            resolve(true);
+          };
+        });
       }
 
-      w.document.body.appendChild(container);
+      // Open image in new tab with HTML document
+      const image = canvas.toDataURL("image/png");
+      const newTab = window.open("", "_blank");
+      if (newTab) {
+        newTab.document.write(`
+          <html>
+            <head><title>Screenshot</title></head>
+            <body style="margin: 0; background: white;">
+              <img src="${image}" style="max-width: 100%; height: auto;" />
+            </body>
+          </html>
+        `);
+        newTab.document.close();
+      }
     }),
   });
   return null;
