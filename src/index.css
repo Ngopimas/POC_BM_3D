@@ -23,3 +23,12 @@ body,
     transform: rotate(360deg);
   }
 }
+
+.top-panel {
+  position: fixed;
+  margin: 10px;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  gap: 10px;
+}

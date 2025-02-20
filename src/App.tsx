@@ -3,15 +3,17 @@ import { Canvas } from "@react-three/fiber";
 import { tableFromJSON } from "apache-arrow";
 import _ from "lodash";
 
+import { Leva } from "leva";
+import ColorLegend from "./components/ColorLegend";
 import Loader from "./components/Loader";
 import Scene from "./components/Scene";
+import { MappingProvider } from "./context/MappingContext";
 import { ParseResult } from "./interfaces/ParseResult";
 import {
   getDataFromArrow,
   getDataFromCSV,
   getFilesFromZIP,
 } from "./utils/loaders";
-import { Leva } from "leva";
 
 function App() {
   const [dropTargetStyle, setDropTargetStyle] = useState(false);
@@ -126,7 +128,7 @@ function App() {
   }, [dropTargetStyle]);
 
   return (
-    <>
+    <MappingProvider>
       <div
         style={{ height: "100vh", ...dropTarget }}
         onDragEnter={addStyleToDropTarget}
@@ -134,16 +136,7 @@ function App() {
         onDrop={handleDrop}
         onDragLeave={removeStyleFromDropTarget}
       >
-        <div
-          style={{
-            position: "fixed",
-            margin: "10px",
-            top: 0,
-            zIndex: 10,
-            display: "grid",
-            gap: "10px",
-          }}
-        >
+        <div className="top-panel">
           <label htmlFor="bm-file">Choose a Block Model file:</label>
           <input
             type="file"
@@ -152,6 +145,9 @@ function App() {
             onChange={changeHandler}
           />
           <button onClick={handleClear}>Clear</button>
+          {parsedData?.meta?.arrow && (
+            <ColorLegend arrow={parsedData.meta.arrow} />
+          )}
         </div>
         <Leva />
         <Canvas onCreated={(state) => (state.gl.localClippingEnabled = true)}>
@@ -159,7 +155,7 @@ function App() {
         </Canvas>
         <Loader isLoading={isLoading} />
       </div>
-    </>
+    </MappingProvider>
   );
 }
 

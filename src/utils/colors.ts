@@ -9,7 +9,7 @@ export const DEFAULT_COLOR = "#FDE725";
 
 interface GetColorFromArrowTableProps {
   table: ArrowTable;
-  attribute: string;
+  attribute?: string;
   colorscale?: ColorsScales;
 }
 

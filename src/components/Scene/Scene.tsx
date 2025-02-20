@@ -10,6 +10,7 @@ import { ParseResult } from "~/interfaces/ParseResult";
 import { Perf } from "r3f-perf";
 import { useControls, button } from "leva";
 import { useFrame, useThree } from "@react-three/fiber";
+import { htmlToImage } from "~/utils/dom";
 
 // @ts-ignore
 const devEnv = import.meta.env?.DEV;
@@ -104,14 +105,36 @@ const Screenshot = () => {
   const { gl, scene, camera } = useThree((state) => state);
   useFrame((state) => (cameraRef.current = state.camera));
   useControls("Global Settings", {
-    SCREENSHOT: button(() => {
+    SCREENSHOT: button(async () => {
       // open in new window
       const w = window.open("", "") as Window;
       w.document.title = "Screenshot";
-      const img = new Image();
+
+      // Create container for both scene and legend
+      const container = document.createElement("div");
+      container.style.position = "relative";
+
+      // Capture scene
+      const sceneImg = new Image();
       gl.render(scene, cameraRef.current || camera);
-      img.src = gl.domElement.toDataURL();
-      w.document.body.appendChild(img);
+      sceneImg.src = gl.domElement.toDataURL();
+      container.appendChild(sceneImg);
+
+      // Capture and position legend
+      const legendElement = document.querySelector(
+        "#color-legend"
+      ) as HTMLElement;
+      if (legendElement) {
+        const legendImg = new Image();
+        legendImg.src = await htmlToImage(legendElement);
+        legendImg.style.position = "absolute";
+        legendImg.style.left = "20px";
+        legendImg.style.top = "20px";
+        legendImg.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
+        container.appendChild(legendImg);
+      }
+
+      w.document.body.appendChild(container);
     }),
   });
   return null;

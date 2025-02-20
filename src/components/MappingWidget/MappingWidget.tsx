@@ -1,6 +1,8 @@
 import React, { useMemo } from "react";
 import chroma from "chroma-js";
 import { useControls } from "leva";
+import { useMappingContext } from "~/context/MappingContext";
+import _ from "lodash";
 
 import Boxes from "~/components/Boxes";
 import { ParseResult } from "~/interfaces/ParseResult";
@@ -49,6 +51,7 @@ const findPopularHeader = (popularArray: string[], headers: string[]) => {
  * />
  */
 const MappingWidget = ({ data }: { data: ParseResult }) => {
+  const { setSelectedProperty, setColorScale } = useMappingContext();
   const headers = useMemo(() => {
     return data?.meta.fields || [];
   }, [data]);
@@ -57,11 +60,13 @@ const MappingWidget = ({ data }: { data: ParseResult }) => {
       value: "",
       options: headers,
       hint: "Property to visualize",
+      onChange: (value) => setSelectedProperty(value),
     },
     colorscale: {
       value: "Viridis",
       options: Object.keys(chroma.brewer),
       hint: "Color scale for the property",
+      onChange: (value) => setColorScale(value),
     },
     x: {
       value: findPopularHeader(mostCommonX, headers),
@@ -122,11 +127,11 @@ const MappingWidget = ({ data }: { data: ParseResult }) => {
     },
   });
 
-  const { property } = mapping;
+  const property = _.get(mapping, "property");
 
   const boxesData = useMemo(() => {
-    return mapping.property
-      ? data?.data?.filter((item) => !!item[mapping.property])
+    return property
+      ? data?.data?.filter((item) => !!item[property])
       : data?.data;
   }, [property, data]);
 

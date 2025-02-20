@@ -12,8 +12,8 @@ interface Props {
   data: { [key: string]: string }[];
   arrow: ArrowTable;
   mapping: {
-    property: string;
-    colorscale: string;
+    property?: string;
+    colorscale?: string;
     x: string;
     y: string;
     z: string;
