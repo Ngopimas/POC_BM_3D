@@ -1,8 +1,8 @@
 import chroma from "chroma-js";
 import _ from "lodash";
 
-import { ArrowTable } from "~/interfaces/ArrowTable";
-import { ColorsScales } from "~/interfaces/ColorsScales";
+import { ArrowTable } from "~/types/ArrowTable";
+import { ColorsScales } from "~/types/ColorsScales";
 import { getMinMaxFromArrow } from "~/utils/arrow";
 
 export const DEFAULT_COLOR = "#FDE725";

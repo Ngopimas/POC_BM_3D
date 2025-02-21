@@ -1,7 +1,7 @@
 import chroma from "chroma-js";
 import _ from "lodash";
 import { getMinMaxFromArrow } from "~/utils/arrow";
-import { ArrowTable } from "~/interfaces/ArrowTable";
+import { ArrowTable } from "~/types/ArrowTable";
 import { useMappingContext } from "~/context/MappingContext";
 
 interface ColorLegendProps {
@@ -35,6 +35,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({ arrow }) => {
   if (!selectedProperty || !colorScale) return null;
 
   const { min, max, range } = getMinMaxFromArrow(arrow, selectedProperty);
+
   if (_.isNil(min) || _.isNil(max)) return null;
 
   const gradientStops = chroma

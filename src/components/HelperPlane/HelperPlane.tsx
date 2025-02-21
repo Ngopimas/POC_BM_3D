@@ -79,7 +79,7 @@ function HelperPlane({ dataBounds, position, rotation, ...props }: Props) {
       <meshBasicMaterial
         color={color}
         side={THREE.DoubleSide}
-        transparent={true}
+        transparent={opacity < 1}
         opacity={opacity}
       />
     </mesh>

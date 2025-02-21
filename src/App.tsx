@@ -8,12 +8,13 @@ import ColorLegend from "./components/ColorLegend";
 import Loader from "./components/Loader";
 import Scene from "./components/Scene";
 import { MappingProvider } from "./context/MappingContext";
-import { ParseResult } from "./interfaces/ParseResult";
+import { ParseResult } from "./types/ParseResult";
 import {
   getDataFromArrow,
   getDataFromCSV,
   getFilesFromZIP,
 } from "./utils/loaders";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   const [dropTargetStyle, setDropTargetStyle] = useState(false);
@@ -128,34 +129,36 @@ function App() {
   }, [dropTargetStyle]);
 
   return (
-    <MappingProvider>
-      <div
-        style={{ height: "100vh", ...dropTarget }}
-        onDragEnter={addStyleToDropTarget}
-        onDragOver={addStyleToDropTarget}
-        onDrop={handleDrop}
-        onDragLeave={removeStyleFromDropTarget}
-      >
-        <div className="top-panel">
-          <label htmlFor="bm-file">Choose a Block Model file:</label>
-          <input
-            type="file"
-            name="bm-file"
-            accept="text/csv, application/zip"
-            onChange={changeHandler}
-          />
-          <button onClick={handleClear}>Clear</button>
-          {parsedData?.meta?.arrow && (
-            <ColorLegend arrow={parsedData.meta.arrow} />
-          )}
+    <ErrorBoundary>
+      <MappingProvider>
+        <div
+          style={{ height: "100vh", ...dropTarget }}
+          onDragEnter={addStyleToDropTarget}
+          onDragOver={addStyleToDropTarget}
+          onDrop={handleDrop}
+          onDragLeave={removeStyleFromDropTarget}
+        >
+          <div className="top-panel">
+            <label htmlFor="bm-file">Choose a Block Model file:</label>
+            <input
+              type="file"
+              name="bm-file"
+              accept="text/csv, application/zip"
+              onChange={changeHandler}
+            />
+            <button onClick={handleClear}>Clear</button>
+            {parsedData?.meta?.arrow && (
+              <ColorLegend arrow={parsedData.meta.arrow} />
+            )}
+          </div>
+          <Leva />
+          <Canvas onCreated={(state) => (state.gl.localClippingEnabled = true)}>
+            <Scene parsedData={parsedData} />
+          </Canvas>
+          <Loader isLoading={isLoading} />
         </div>
-        <Leva />
-        <Canvas onCreated={(state) => (state.gl.localClippingEnabled = true)}>
-          <Scene parsedData={parsedData} />
-        </Canvas>
-        <Loader isLoading={isLoading} />
-      </div>
-    </MappingProvider>
+      </MappingProvider>
+    </ErrorBoundary>
   );
 }
 

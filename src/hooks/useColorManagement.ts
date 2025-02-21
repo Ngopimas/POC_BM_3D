@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 import { getColorFromArrowTable } from "~/utils/colors";
-import { ArrowTable } from "~/interfaces/ArrowTable";
-import { ColorsScales } from "~/interfaces/ColorsScales";
+import { ArrowTable } from "~/types/ArrowTable";
+import { ColorsScales } from "~/types/ColorsScales";
 
 interface UseColorManagementProps {
   data: { [key: string]: string }[];

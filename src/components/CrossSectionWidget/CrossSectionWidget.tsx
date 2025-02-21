@@ -5,10 +5,21 @@ import * as THREE from "three";
 import _ from "lodash";
 
 import HelperPlane from "~/components/HelperPlane";
-import { ArrowTable } from "~/interfaces/ArrowTable";
+import { ArrowTable } from "~/types/ArrowTable";
 import { getMinMaxFromArrow } from "~/utils/arrow";
 
 const plane = new THREE.Plane();
+
+/**
+ * Add safety checks and default values
+ * @param value - The value to round
+ * @returns The rounded value or 0 if the value is invalid
+ */
+const safeRound = (value: any) => {
+  if (_.isNil(value)) return 0;
+  const num = Number(value);
+  return _.isNaN(num) ? 0 : _.round(num);
+};
 
 interface Props {
   data: { [key: string]: string }[];
@@ -53,9 +64,11 @@ interface Props {
  */
 const CrossSectionWidget = ({ data, arrow, mapping, onClipChange }: Props) => {
   const clipDirections = ["x", "y", "z"];
-  const startX = _.round(Number(data[0][mapping["x"]]));
-  const startY = _.round(Number(data[0][mapping["y"]]));
-  const startZ = _.round(Number(data[0][mapping["z"]]));
+
+  const startX = safeRound(data?.[0]?.[mapping["x"]]);
+  const startY = safeRound(data?.[0]?.[mapping["y"]]);
+  const startZ = safeRound(data?.[0]?.[mapping["z"]]);
+
   const { min: minX, max: maxX } = getMinMaxFromArrow(arrow, mapping["x"]);
   const { min: minY, max: maxY } = getMinMaxFromArrow(arrow, mapping["y"]);
   const { min: minZ, max: maxZ } = getMinMaxFromArrow(arrow, mapping["z"]);

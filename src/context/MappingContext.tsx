@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import { ColorsScales } from "~/interfaces/ColorsScales";
+import { ColorsScales } from "~/types/ColorsScales";
 
 interface MappingContextType {
   selectedProperty: string;

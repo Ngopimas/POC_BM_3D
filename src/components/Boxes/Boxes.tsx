@@ -2,7 +2,7 @@ import React, { useRef, useLayoutEffect, useState } from "react";
 import * as THREE from "three";
 import _ from "lodash";
 
-import { ArrowTable } from "~/interfaces/ArrowTable";
+import { ArrowTable } from "~/types/ArrowTable";
 import CrossSectionWidget from "~/components/CrossSectionWidget";
 import { useColorManagement } from "~/hooks/useColorManagement";
 import { useMappingContext } from "~/context/MappingContext";
@@ -89,6 +89,8 @@ function Boxes({ data = [], mapping, arrow }: Props) {
   });
 
   useLayoutEffect(() => {
+    if (!data.length) return;
+
     const xOrigin = Number(data[0][mapping["x"]]) + 1;
     const yOrigin = Number(data[0][mapping["y"]]) + 1;
     const zOrigin = Number(data[0][mapping["z"]]) + 1;
@@ -110,8 +112,13 @@ function Boxes({ data = [], mapping, arrow }: Props) {
           : _.get(mapping, ["block_dimension", "y"])
       );
       obj.updateMatrix();
-      ref.current?.setMatrixAt(i + 1, obj.matrix);
-      edgesRef.current?.setMatrixAt(i + 1, obj.matrix);
+
+      if (ref.current && "setMatrixAt" in ref.current) {
+        ref.current.setMatrixAt(i + 1, obj.matrix);
+      }
+      if (edgesRef.current && "setMatrixAt" in edgesRef.current) {
+        edgesRef.current.setMatrixAt(i + 1, obj.matrix);
+      }
     }
 
     if (ref.current?.instanceMatrix) {

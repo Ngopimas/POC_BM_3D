@@ -5,7 +5,7 @@ import { useMappingContext } from "~/context/MappingContext";
 import _ from "lodash";
 
 import Boxes from "~/components/Boxes";
-import { ParseResult } from "~/interfaces/ParseResult";
+import { ParseResult } from "~/types/ParseResult";
 import {
   mostCommonDimX,
   mostCommonDimY,
