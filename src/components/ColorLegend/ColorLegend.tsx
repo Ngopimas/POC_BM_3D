@@ -54,7 +54,7 @@ const ColorLegend: React.FC<ColorLegendProps> = ({ arrow }) => {
       style={{
         background: "white",
         padding: "10px",
-        borderRadius: "4px",
+        borderRadius: "6px",
         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
         userSelect: "none",
         touchAction: "none",
