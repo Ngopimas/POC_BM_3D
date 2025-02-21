@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import chroma from "chroma-js";
-import { useControls } from "leva";
+import { useControls, folder } from "leva";
 import { useMappingContext } from "~/context/MappingContext";
 import _ from "lodash";
 
@@ -57,92 +57,124 @@ const MappingWidget = ({ data }: { data: ParseResult }) => {
     return data?.meta.fields || [];
   }, [data]);
   const mapping = useControls("Block Model", {
-    property: {
-      value: "",
-      options: headers,
-      hint: "Property to visualize",
-      onChange: (value) => setSelectedProperty(value),
-    },
-    colorscale: {
-      value: "Viridis",
-      options: Object.keys(chroma.brewer),
-      hint: "Color scale for the property",
-      onChange: (value) => setColorScale(value),
-    },
-    x: {
-      value: findPopularHeader(mostCommonX, headers),
-      options: headers,
-      hint: "X coordinate",
-    },
-    y: {
-      value: findPopularHeader(mostCommonY, headers),
-      options: headers,
-      hint: "Y coordinate",
-    },
-    z: {
-      value: findPopularHeader(mostCommonZ, headers),
-      options: headers,
-      hint: "Z coordinate",
-    },
-    use_dimension_columns: {
-      value: true,
-      label: "use dimension columns",
-      hint: "Use dimension columns instead of block dimension values",
-    },
-    dim_x: {
-      value: findPopularHeader(mostCommonDimX, headers),
-      options: headers,
-      render: (get) => get("Block Model.use_dimension_columns"),
-      hint: "Dimension of the block in the x direction",
-    },
-    dim_y: {
-      value: findPopularHeader(mostCommonDimY, headers),
-      options: headers,
-      render: (get) => get("Block Model.use_dimension_columns"),
-      hint: "Dimension of the block in the y direction",
-    },
-    dim_z: {
-      value: findPopularHeader(mostCommonDimZ, headers),
-      options: headers,
-      render: (get) => get("Block Model.use_dimension_columns"),
-      hint: "Dimension of the block in the z direction",
-    },
-    block_dimension: {
-      value: { x: 5, y: 5, z: 5 },
-      joystick: false,
-      render: (get) => !get("Block Model.use_dimension_columns"),
-      label: "block dimension",
-      hint: "Fixed dimensions for all blocks when not using dimension columns",
-    },
-    zScale: {
-      value: 1,
-      min: 1,
-      step: 1,
-      label: "z scale",
-      hint: "Scale factor for the Z axis",
-    },
-    showEdges: {
-      value: false,
-      label: "toggle edges",
-      hint: "Show blocks edges. Can lead to performance issues",
-    },
-    hiddeZeroValues: {
-      value: true,
-      label: "hide 0",
-      hint: "Hide blocks with 0 values",
-    },
+    "Property Selection": folder({
+      property: {
+        value: "",
+        options: headers,
+        hint: "Property to visualize",
+        onChange: (value) => setSelectedProperty(value),
+      },
+      colorscale: {
+        value: "Viridis",
+        options: Object.keys(chroma.brewer),
+        hint: "Color scale for the property",
+        onChange: (value) => setColorScale(value),
+      },
+      hideValue: {
+        value: "NaN",
+        label: "hide value",
+        hint: "Hide blocks with this value (e.g. 0)",
+      },
+    }),
+
+    Coordinates: folder({
+      x: {
+        value: findPopularHeader(mostCommonX, headers),
+        options: headers,
+        hint: "X coordinate",
+      },
+      y: {
+        value: findPopularHeader(mostCommonY, headers),
+        options: headers,
+        hint: "Y coordinate",
+      },
+      z: {
+        value: findPopularHeader(mostCommonZ, headers),
+        options: headers,
+        hint: "Z coordinate",
+      },
+    }),
+
+    "Block Dimensions": folder({
+      use_dimension_columns: {
+        value: true,
+        label: "use dimension columns",
+        hint: "Use dimension columns instead of block dimension values",
+      },
+      dim_x: {
+        value: findPopularHeader(mostCommonDimX, headers),
+        options: headers,
+        render: (get) =>
+          get("Block Model.Block Dimensions.use_dimension_columns"),
+        hint: "Dimension of the block in the x direction",
+      },
+      dim_y: {
+        value: findPopularHeader(mostCommonDimY, headers),
+        options: headers,
+        render: (get) =>
+          get("Block Model.Block Dimensions.use_dimension_columns"),
+        hint: "Dimension of the block in the y direction",
+      },
+      dim_z: {
+        value: findPopularHeader(mostCommonDimZ, headers),
+        options: headers,
+        render: (get) =>
+          get("Block Model.Block Dimensions.use_dimension_columns"),
+        hint: "Dimension of the block in the z direction",
+      },
+      block_dimension: {
+        value: { x: 5, y: 5, z: 5 },
+        joystick: false,
+        render: (get) =>
+          !get("Block Model.Block Dimensions.use_dimension_columns"),
+        label: "block dimension",
+        hint: "Fixed dimensions for all blocks when not using dimension columns",
+      },
+    }),
+
+    "Visual Options": folder({
+      showEdges: {
+        value: false,
+        label: "toggle edges",
+        hint: "Show blocks edges. Can lead to performance issues",
+      },
+      zScale: {
+        value: 1,
+        min: 1,
+        step: 1,
+        label: "z exageration",
+        hint: "Scale factor for the Z axis",
+      },
+    }),
   });
 
   const boxesData = useMemo(() => {
     return selectedProperty
       ? data?.data?.filter((item) => {
-          if (mapping.hiddeZeroValues) {
-            return !!item[selectedProperty];
+          const value = item[selectedProperty];
+          const hideValue = mapping.hideValue?.trim()?.toLowerCase();
+
+          // If hideValue is empty, show all values
+          if (!hideValue) {
+            return true;
           }
-          return !_.isNil(item[selectedProperty]);
+
+          // Handle NaN values
+          if (hideValue === "nan") {
+            return !Number.isNaN(value) && value !== "nan" && value !== "NaN";
+          }
+
+          // Handle numeric values
+          const numericHideValue = Number(hideValue);
+          if (!Number.isNaN(numericHideValue)) {
+            return Number(value) !== numericHideValue && value !== hideValue;
+          }
+
+          // Handle string values
+          return value !== hideValue;
         })
       : data?.data;
-  }, [selectedProperty, mapping.hiddeZeroValues, data]);
+  }, [selectedProperty, mapping.hideValue, data]);
 
   type MappingKeys = keyof typeof mapping;
 
