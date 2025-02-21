@@ -1,1 +1,0 @@
-*{margin:0;padding:0;box-sizing:border-box}html,body,#root{position:fixed;top:0;left:0;width:100vw;height:100%;background:#f0f0f0}@keyframes rotate{0%{transform:rotate(0)}to{transform:rotate(360deg)}}.top-panel{position:fixed;margin:10px;top:0;z-index:10;display:grid;gap:10px}
