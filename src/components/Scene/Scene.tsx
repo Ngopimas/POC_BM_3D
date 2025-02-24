@@ -42,12 +42,12 @@ function Scene({ parsedData }: Props) {
     {
       toggle_axes: {
         value: true,
-        label: "toggle axes",
-        hint: "Toggle the bottom left axes",
+        label: "direction axes",
+        hint: "Toggle the bottom left direction axes",
       },
       toggle_perf: {
-        value: false,
-        label: "toggle perf",
+        value: true,
+        label: "perf monitor",
         hint: "Toggle the performance monitor",
       },
     },

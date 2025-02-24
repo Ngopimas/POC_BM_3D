@@ -135,8 +135,8 @@ const MappingWidget = ({ data }: { data: ParseResult }) => {
     "Visual Options": folder({
       showEdges: {
         value: false,
-        label: "toggle edges",
-        hint: "Show blocks edges. Can lead to performance issues",
+        label: "edges",
+        hint: "Show blocks edges (can lead to performance issues)",
       },
       zScale: {
         value: 1,
