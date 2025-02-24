@@ -36,5 +36,5 @@ body,
 .bottom-right {
   border-radius: 6px 0 0 0;
   padding: 4px;
-  background: var(--leva-colors-elevation2);
+  background: #181c20;
 }

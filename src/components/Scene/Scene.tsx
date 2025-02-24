@@ -13,6 +13,8 @@ import ErrorBoundary from "../ErrorBoundary";
 import MappingWidget from "../MappingWidget";
 import Screenshot from "../Screenshot";
 
+const isDev = process.env.NODE_ENV === "development";
+
 interface Props {
   parsedData: ParseResult | null;
 }
@@ -80,7 +82,9 @@ function Scene({ parsedData }: Props) {
         />
       </GizmoHelper>
 
-      {controls["toggle_perf"] && <Perf position="bottom-right" />}
+      {controls["toggle_perf"] && (
+        <Perf position="bottom-right" minimal={!isDev} />
+      )}
     </ErrorBoundary>
   );
 }
