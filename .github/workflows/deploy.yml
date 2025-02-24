@@ -32,8 +32,8 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git checkout main
-          git pull origin main
+          git fetch origin main
+          git switch main || git switch -c main
           rm -rf docs
           mv dist docs
           git add docs
