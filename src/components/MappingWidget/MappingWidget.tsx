@@ -29,6 +29,11 @@ const findPopularHeader = (popularArray: string[], headers: string[]) => {
   );
 };
 
+interface MappingWidgetProps {
+  data: ParseResult;
+  showTooltips?: boolean;
+}
+
 /**
  * A component that provides a user interface for mapping block model data properties
  * to visual attributes in the 3D visualization. It allows users to:
@@ -41,6 +46,7 @@ const findPopularHeader = (popularArray: string[], headers: string[]) => {
  * @component
  * @param {Object} props - Component props
  * @param {ParseResult} props.data - Parsed block model data containing data array and metadata
+ * @param {boolean} [props.showTooltips=true] - Whether to show tooltips on hover
  *
  * @example
  * <MappingWidget
@@ -48,9 +54,10 @@ const findPopularHeader = (popularArray: string[], headers: string[]) => {
  *     data: [...],
  *     meta: { fields: ["x", "y", "z", "grade", "rock_type"] }
  *   }}
+ *   showTooltips={true}
  * />
  */
-const MappingWidget = ({ data }: { data: ParseResult }) => {
+const MappingWidget = ({ data, showTooltips = true }: MappingWidgetProps) => {
   const { selectedProperty, setSelectedProperty, setColorScale } =
     useMappingContext();
   const headers = useMemo(() => {
@@ -183,7 +190,12 @@ const MappingWidget = ({ data }: { data: ParseResult }) => {
       {["x", "y", "z"].every((v) => {
         return !!mapping[v as MappingKeys];
       }) && (
-        <Boxes data={boxesData} mapping={mapping} arrow={data.meta.arrow} />
+        <Boxes
+          data={boxesData}
+          mapping={mapping}
+          arrow={data.meta.arrow}
+          showTooltips={showTooltips}
+        />
       )}
     </>
   );

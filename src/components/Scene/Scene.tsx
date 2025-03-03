@@ -37,24 +37,23 @@ interface Props {
  * />
  */
 function Scene({ parsedData }: Props) {
-  const controls = useControls(
-    "Global Settings",
-    {
-      toggle_axes: {
-        value: true,
-        label: "direction axes",
-        hint: "Toggle the bottom left direction axes",
-      },
-      toggle_perf: {
-        value: true,
-        label: "perf monitor",
-        hint: "Toggle the performance monitor",
-      },
+  const controls = useControls("Global Settings", {
+    toggle_tooltips: {
+      value: false,
+      label: "tooltips",
+      hint: "Toggle tooltips when hovering over blocks",
     },
-    {
-      collapsed: true,
-    }
-  );
+    toggle_axes: {
+      value: true,
+      label: "direction axes",
+      hint: "Toggle the bottom left direction axes",
+    },
+    toggle_perf: {
+      value: true,
+      label: "perf monitor",
+      hint: "Toggle the performance monitor",
+    },
+  });
   return (
     <ErrorBoundary>
       <ArcballControls makeDefault />
@@ -70,7 +69,12 @@ function Scene({ parsedData }: Props) {
       <ambientLight />
 
       <Suspense fallback={null}>
-        {parsedData?.data && <MappingWidget data={parsedData} />}
+        {parsedData?.data && (
+          <MappingWidget
+            data={parsedData}
+            showTooltips={controls["toggle_tooltips"]}
+          />
+        )}
       </Suspense>
 
       <Screenshot />

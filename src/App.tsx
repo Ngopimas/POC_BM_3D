@@ -1,4 +1,4 @@
-import React, { DragEventHandler, useMemo, useState } from "react";
+import React, { DragEventHandler, useMemo, useState, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { tableFromJSON } from "apache-arrow";
 import _ from "lodash";
@@ -20,6 +20,7 @@ function App() {
   const [dropTargetStyle, setDropTargetStyle] = useState(false);
   const [parsedData, setParsedData] = useState<ParseResult | null>(null);
   const [isLoading, setLoading] = useState<boolean>(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleParsedData = (data: { [key: string]: string }[]) => {
     const arrowTable = tableFromJSON(data);
@@ -76,10 +77,9 @@ function App() {
   };
 
   const handleClear = () => {
-    // if (inputRef.current) {
-    //   inputRef.current.value = "";
-    // }
-    // setParsedData(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     location.reload();
   };
 
@@ -141,6 +141,7 @@ function App() {
           <div className="top-panel">
             <label htmlFor="bm-file">Choose a Block Model file:</label>
             <input
+              ref={fileInputRef}
               type="file"
               name="bm-file"
               accept="text/csv, application/zip"
@@ -151,7 +152,7 @@ function App() {
               <ColorLegend arrow={parsedData.meta.arrow} />
             )}
           </div>
-          <Leva />
+          <Leva hideCopyButton />
           <Canvas onCreated={(state) => (state.gl.localClippingEnabled = true)}>
             <Scene parsedData={parsedData} />
           </Canvas>
